@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+
+# 虚拟环境
+venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# 数据文件
+data/*.db
+data/uploads/
+data/reports/
+data/history/
+data/*.log
+
+# 配置文件（包含API Key）
+config.py
+
+# 日志
+*.log
+
+# 缓存
+.cache/
+.streamlit/cache/
+
+# 测试
+.pytest_cache/
+.coverage
+htmlcov/
+
+# 临时文件
+*.tmp
+*.bak
+*.orig
