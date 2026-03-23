@@ -19,11 +19,11 @@ class MarketingStrategistAgent(BaseAgent):
         user_summary = task.get("user_data_summary", "")
         sales_summary = task.get("sales_data_summary", "")
         
-        # 构建完整输入
-        full_input = self._build_full_input(user_summary, sales_summary)
+        # 使用提示词模板构建输入（从 prompts/ 加载）
+        user_message = self._build_user_message(user_summary, sales_summary)
         
         # 一次LLM调用生成完整策略
-        strategy_result = self._generate_strategy_with_llm(full_input)
+        strategy_result = self._generate_strategy_with_llm(user_message)
         
         self.logger.info(f"营销策略生成完成")
         
@@ -35,38 +35,28 @@ class MarketingStrategistAgent(BaseAgent):
             "expected_impact": strategy_result.get("expected_impact", "")
         }
     
-    def _build_full_input(self, user_summary: str, sales_summary: str) -> str:
-        """构建完整的LLM输入"""
+    def _build_user_message(self, user_summary: str, sales_summary: str) -> str:
+        """使用提示词模板构建用户消息"""
+        # 从 base 类加载的 prompt 中提取模板
+        # 这里简单拼接，也可以从 yaml 读取模板
         return f"""
+请根据以下数据，制定营销策略：
+
 【用户数据】
 {user_summary}
 
 【销售数据】
 {sales_summary}
 
-请基于以上数据生成营销策略。
+请以JSON格式输出营销策略。
 """
     
-    def _generate_strategy_with_llm(self, full_input: str) -> Dict:
+    def _generate_strategy_with_llm(self, user_message: str) -> Dict:
         """用LLM生成营销策略"""
         
-        prompt = f"""你是电商营销策略专家。请根据以下数据，制定营销策略。
-
-{full_input}
-
-请以JSON格式输出：
-{{
-    "overall_strategy": "一句话总结核心策略",
-    "action_plan": [
-        {{"target": "目标人群", "action": "具体动作", "channel": "触达渠道", "priority": "高"}},
-        {{"target": "目标人群", "action": "具体动作", "channel": "触达渠道", "priority": "中"}}
-    ],
-    "expected_impact": "预期效果"
-}}
-
-请直接输出JSON："""
-        
-        response = self._call_llm(prompt, temperature=0.7, use_cache=True)
+        # 直接使用 base 类的 _call_llm 方法
+        # base 类已经处理了 system_prompt 的加载
+        response = self._call_llm(user_message, temperature=0.7, use_cache=True)
         
         # 如果LLM失败，返回默认策略
         if "Mock" in response or "错误" in response or not self.llm:
